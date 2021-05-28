@@ -1,4 +1,4 @@
-# BarnBridge-Vesting
+# UniverseXYZ-Vesting
 
 ##Prerequisites:
 
