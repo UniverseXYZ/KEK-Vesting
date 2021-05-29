@@ -6,7 +6,7 @@ const Erc20abi = [{ "inputs": [], "stateMutability": "nonpayable", "type": "cons
 async function main() {
     const Vesting = await ethers.getContractFactory('Vesting')
 
-    const _xyzTokenAddress = '0x41e88dc0dfa5455e64327484f1862332413520da'
+    const _xyzTokenAddress = '0x618679dF9EfCd19694BB1daa8D00718Eacfa2883'
     const XYZToken = await ethers.getContractAt(Erc20abi, _xyzTokenAddress);
 
     const startTime = 1622419200
@@ -697,10 +697,14 @@ async function main() {
     for (let i = startIndex; i < owners.length; i++) {
 
         crtTimestamp = Math.floor(new Date().getTime() / 1000)
-        if (crtTimestamp - lastGasEstimateTimestamp > 30) {
-            const price = await axios.get('https://www.gasnow.org/api/v3/gas/price?utm_source=UniverseXYZVestingDeployer');
-            gasPrice = Math.round(1.15 * price.data.data.fast);
-            console.log(`got new price at ${crtTimestamp}, value: ${gasPrice}`);
+        if (crtTimestamp - lastGasEstimateTimestamp > 120) {
+            try{
+                const price = await axios.get('https://www.gasnow.org/api/v3/gas/price?utm_source=UniverseXYZVestingDeployer');
+                gasPrice = Math.round(1.15 * price.data.data.fast);
+                console.log(`got new price at ${crtTimestamp}, value: ${gasPrice}`);
+            } catch (e) {
+                console.log('price req timed out');
+            }
             lastGasEstimateTimestamp = crtTimestamp;
         }
 
@@ -709,12 +713,13 @@ async function main() {
             amount = ethers.BigNumber.from(owner.amount)
                 .mul(ethers.BigNumber.from(10).pow(18))
 
+            console.log(`Start deploy vesting contract index ${i}`);
             currentVesting = await Vesting.deploy(owner.address, _xyzTokenAddress, startTime, amount, { gasPrice: gasPrice })
             await currentVesting.deployed()
 
             await XYZToken.transfer(currentVesting.address, amount, { gasPrice: gasPrice })
 
-            console.log(`Deploy vesting contract index. ${i} for ${owner.address} at ${currentVesting.address}, amount ${owner.amount.toLocaleString()}`)
+            console.log(`Deployed vesting contract index ${i} for ${owner.address} at ${currentVesting.address}, amount ${owner.amount.toLocaleString()}`)
         } else {
             console.log('Too expensive to deploy');
             break;
