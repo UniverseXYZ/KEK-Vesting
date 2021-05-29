@@ -402,7 +402,11 @@ async function main() {
         },
         {
             "address": "0x597880a850b323c6059D35FD4b59ce65C5E42E20",
-            "amount": 63_391_000
+            "amount": 44_800_000
+        },
+        {
+            "address": "0x36bD9a6039B9c822365eF9bABD25Fefc98B473aF",
+            "amount": 18_591_000
         },
         {
             "address": "0xeEE5Eb24E7A0EA53B75a1b9aD72e7D20562f4283",
